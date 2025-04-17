@@ -1,0 +1,176 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="icon" href="favicon.ico" />
+    <title>Fuck DHL</title>
+    <script src="qrcode.js"></script><!-- https://github.com/davidshimjs/qrcodejs -->
+    <style>
+      html, body, header {
+        margin: 0;
+        padding: 0;
+      }
+      
+      @font-face {
+        font-family: 'Delivery A';
+        src: url('default-4bcce82160b8c6f178f0.woff2') format('woff2');
+        font-weight: normal;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Delivery B';
+        src: url('default-15a7ed37f53bdda49a82.woff2') format('woff2');
+        font-weight: normal;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Delivery C';
+        src: url('default-b8062306a9c370ef50f5.woff2') format('woff2');
+        font-weight: normal;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Delivery D';
+        src: url('default-2d649dcaa71ff88f7b8a.woff2') format('woff2');
+        font-weight: normal;
+        font-style: normal;
+      }
+      
+      * {
+        font-family: 'Delivery A', sans-serif;
+      }
+      
+      #parcelId {
+        text-decoration: underline;
+        color: #d40511;
+      }
+      #pickupCodeBlock {
+        margin-top: 36px;
+      }
+      #pickupCodeBlock img {
+        float: left;
+        width: 64px;
+        margin: 6px 24px 0px 8px;
+      }
+      #pickupCodeBlock h2 {
+        margin: 4px 0px 4px;
+      }
+
+      h1 {
+        color: #d40511;
+        text-transform: uppercase;
+        font-family: 'Delivery B';
+        font-size: 20pt;
+      }
+
+      h2, h2 * {
+        font-family: 'Delivery C';
+        font-size: 14pt;
+      }
+      
+      h2 span {
+        text-transform: uppercase;
+      }
+      
+      #qrcode {
+        width: 250px;
+        margin: 4em auto;
+      }
+      
+      header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: linear-gradient(90deg, #fc0, #fc0 30%, #ffe57f 79%, #fff0b2);
+      }
+      header img {
+        height: 22px;
+        padding: 22px;
+      }
+
+      content {
+        display: block;
+      }
+
+      content, header > div {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      
+      content > div {
+        max-width: 800px;
+        padding: 4.5em 1.5em;
+      }
+      
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <img src="dhl-logo.svg">
+      </div>
+    </header>
+    <content>
+      <div>
+        <h1>Vergeet je pakket niet op te halen</h1>
+        <h2>Beste <span id="recipient">Lorem Ipsum</span>,</h2>
+        <p>
+          Je pakket <span id="parcelId">JVGL00000000000000000000</span> van <span id="sender">Dolor Sit Amet</span> ligt nu 2 dagen op het DHL ServicePoint.
+          Kom je je pakket ophalen? Je pakket ligt nog 5 dagen op het DHL punt, daarna sturen we het retour.
+        </p>
+        <h2>Laat deze afhaalcode scannen</h2>
+        <div id="pickupCodeBlock">
+          <img src="track-en-trace.png">
+          <h2>Afhaalcode</h2>
+          <span id="pickupCode">ABCDEF</span>
+        </div>
+        <div id="qrcode"></div>
+      </div>
+    </content>
+    <script type="text/javascript">
+      var parcelId = document.getElementById('parcelId');
+      var pickupCode = document.getElementById('pickupCode');
+      var recipient = document.getElementById('recipient');
+      var sender = document.getElementById('sender');
+
+      try {
+          var j = JSON.parse(decodeURI(location.hash.slice(1)));
+          parcelId.innerHTML = j.parcelId;
+          pickupCode.innerHTML = j.pickupCode;
+          
+          recipient.innerHTML = j.recipient;
+          sender.innerHTML = j.sender;
+      } catch {}
+
+      var qrcode = new QRCode(document.getElementById("qrcode"), {
+        width: 250,
+        height: 250,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+      });
+
+      function refresh() {
+        var o = {};
+        o.parcelId = parcelId.innerText,
+        o.pickupCode = pickupCode.innerText,
+        qrcode.makeCode(JSON.stringify(o));
+
+        o.recipient = recipient.textContent;
+        o.sender = sender.textContent;
+        location.hash = JSON.stringify(o);
+        console.log(o);
+      }
+
+      for(const e of document.querySelectorAll('span[id]')) {
+        e.contentEditable = true;
+        e.spellcheck = false;
+        e.oninput = refresh;
+      }
+
+      refresh();
+    </script>
+  </body>
+</html>
